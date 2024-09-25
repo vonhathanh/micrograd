@@ -1,3 +1,6 @@
+from visualize import draw_dot
+
+
 class Value:
     def __init__(self, data, chilren=(), _op='', label=''):
         self.data = data
@@ -23,3 +26,5 @@ if __name__ == '__main__':
 
     d = a*b + c
     print(d, d._prev, d._op)
+
+    draw_dot(d)
