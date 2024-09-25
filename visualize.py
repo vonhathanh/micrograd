@@ -34,4 +34,6 @@ def draw_dot(root):
         # connect n1 to the op node of n2
         dot.edge(str(id(n1)), str(id(n2)) + n2._op)
 
+    dot.render(directory='out').replace('\\', '/')
+
     return dot
