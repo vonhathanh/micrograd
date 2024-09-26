@@ -1,4 +1,5 @@
 import math
+import random
 
 from visualize import draw_dot
 
@@ -74,6 +75,9 @@ class Value:
     def __sub__(self, other):
         return self + (-other)
 
+    def __rsub__(self, other):
+        return self + (-other)
+
     def tanh(self):
         x = self.data
         t = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
@@ -115,33 +119,71 @@ class Value:
             node._backward()
 
 
+class Neuron:
+    def __init__(self, nin):
+        self.w = [Value(random.uniform(1, -1)) for _ in range(nin)]
+        self.b = Value(random.uniform(1, -1))
+
+    def __call__(self, x):
+        act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
+        out = act.tanh()
+        return out
+
+    def parameters(self):
+        return self.w + [self.b]
+
+
+class Layer:
+    def __init__(self, nin, nout):
+        self.neurons = [Neuron(nin) for _ in range(nout)]
+
+    def __call__(self, x):
+        outs = [n(x) for n in self.neurons]
+        return outs[0] if len(outs) == 1 else outs
+
+    def parameters(self):
+        return [p for neuron in self.neurons for p in neuron.parameters()]
+
+
+class MLP:
+    def __init__(self, nin, nouts):
+        sz = [nin] + nouts
+        self.layers = [Layer(sz[i], sz[i+1]) for i in range(len(nouts))]
+
+    def __call__(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+
+    def parameters(self):
+        return [p for layer in self.layers for p in layer.parameters()]
+
+
 if __name__ == '__main__':
-    x1 = Value(2.0, label='x1')
-    x2 = Value(0.0, label='x2')
+    x = [2.0, 3.0, -1.0]
+    n = MLP(3, [4, 4, 1])
 
-    w1 = Value(-3.0, label='w1')
-    w2 = Value(1.0, label='w2')
+    xs = [
+        [2.0, 3.0, -1.0],
+        [3.0, -1.0, 0.5],
+        [0.5, 1.0, 1.0],
+        [1.0, 1.0, -1.0],
+    ]
+    ys = [1.0, -1.0, -1.0, 1.0]  # desired targets
+    ypred = [n(x) for x in xs]
+    print(ypred)
 
-    b = Value(6.8813735870195432, label='b')
+    loss = sum([(ygt - ypred)**2 for ygt, ypred in zip(ys, ypred)])
 
-    x1w1 = x1 * w1
-    x1w1.label = 'x1*w1'
+    print(loss)
 
-    x2w2 = x2 * w2
-    x2w2.label = 'x2*w2'
+    loss.backward()
 
-    x1w1x2w2 = x1w1 + x2w2
-    x1w1x2w2.label = 'x1w1 + x2w2'
+    for p in n.parameters():
+        p.data += -0.01 * p.grad
 
-    n = x1w1x2w2 + b; n.label = 'n'
+    ypred = [n(x) for x in xs]
+    loss = sum([(ygt - ypred) ** 2 for ygt, ypred in zip(ys, ypred)])
 
-    e = (2*n).exp()
-    o = (e - 1) / (e + 1)
+    print(loss)
 
-    o.label = 'o'
-
-    o.grad = 1.0
-
-    o.backward()
-
-    draw_dot(o)
