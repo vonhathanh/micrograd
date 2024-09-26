@@ -50,11 +50,14 @@ class Value:
     def __rmul__(self, other):
         return self * other
 
+    def __truediv__(self, other):
+        return self * (other ** -1)
+
     def __rtruediv__(self, other):
-        return self * other**-1
+        return self * (other**-1)
 
     def __pow__(self, power):
-        assert isinstance(power, (int, float), "only supporting integer/float powers for now")
+        assert isinstance(power, (int, float)), "only supporting integer/float powers for now"
 
         out = Value(self.data ** power, (self, ), f'**{power}')
 
@@ -113,8 +116,6 @@ class Value:
 
 
 if __name__ == '__main__':
-    a = Value(1.0)
-    print(a+10, a*10)
     x1 = Value(2.0, label='x1')
     x2 = Value(0.0, label='x2')
 
@@ -134,7 +135,9 @@ if __name__ == '__main__':
 
     n = x1w1x2w2 + b; n.label = 'n'
 
-    o = n.tanh()
+    e = (2*n).exp()
+    o = (e - 1) / (e + 1)
+
     o.label = 'o'
 
     o.grad = 1.0
