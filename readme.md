@@ -13,3 +13,16 @@
 - Start with a tiny, small NN first (ideally one layer of MLP)
 - Careful about dead neural (all inputs were zero -> matmul x*w is zero, no gradient)
 - We want the input to be Gaussian distributed as we as the output (mean ~= 0 and std ~= 1) -> use kaiming init
+  - The reason behind this is we don't want the activation x*w becomes too small or too large, too small and activation(x) = 0
+  - Same as too large, derivate of too large number is squashed to 0
+  - Atleast at normalization these activations should roughly Gaussian distributed
+- Batch normalization to make the hidden states becomes Gaussian distribution (subtract means and divide by std)
+- We don't want the hidden states to always Gaussian (at init is okay), that's why BN layer add some scale gamma and shifting beta
+- The side effect of adding BN layer is that we are coupling each training example with new variables (mean, std) in the mini batch
+- We'll get a jitter if we do inference a single example (subtract by mean and divide by std)
+- This actually turns out to be good in training phase? Let's see them as a regularizer, it's like a data augmentation, make it harder to overfit
+- Another problem BN adds is that in inference time, we can't get the mean and std of a single example
+- Solution: 
+  - calculate the mean and std of the entire dataset
+  - Estimate the mean and std during training
+- If we add BN layer, bias in w*x + b are useless because they are subtracted out by the mean
