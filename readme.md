@@ -26,3 +26,4 @@
   - calculate the mean and std of the entire dataset
   - Estimate the mean and std during training
 - If we add BN layer, bias in w*x + b are useless because they are subtracted out by the mean
+- The only learned params in BN layer are gamma and beta, https://claude.ai/chat/a18257a1-f307-4d8d-9f0d-8bd52354f12d
