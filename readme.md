@@ -27,3 +27,21 @@
   - Estimate the mean and std during training
 - If we add BN layer, bias in w*x + b are useless because they are subtracted out by the mean
 - The only learned params in BN layer are gamma and beta, https://claude.ai/chat/a18257a1-f307-4d8d-9f0d-8bd52354f12d
+- Ex01: If we set all weights and bias to zero then:
+  - The result of linear layer is zero, the output of activation fn is zero
+  - Let t = w[i]*x[i], we have
+  - dL/dx[i] = dL/dtanh(t)*dtanh(t)/dx[i]
+  - dtanh(t)/dx[i] = dtanh(t)/dt * dt/dx[i]
+  - dt/dx[i] = d(w[i]*x[i])/dx[i] = w[i]. Since w[i] = 0, dt/dx[i]
+  - Replace t = 0, dtanh(t)/d(x[i]*w[i]) = dtanh(0)/dt = 1
+  - dtanh(t)/dx[i] = 0 * 1 = 0
+- Ex02: After the training, we got: running_mean, running_var, gamma and beta
+  - Output of the first linear layer: t = w*x + b
+  - Out put of BN layer: t1 = (t - running_mean) / sqrt(running_var + epsilon)
+  - t2 = t1*gamma + beta
+  - If we want to fold BN into Linear layer then:
+  - (t - running_mean) / sqrt(running_var + epsilon) * gamma + beta
+  - (t - running_mean) * gamma = -beta*sqrt(running_var + epsilon)
+  - t - running_mean = -beta*sqrt(running_var + epsilon)/gamma
+  - t = -beta*sqrt(running_var + epsilon)/gamma - running_mean
+  - https://chatgpt.com/c/67034971-b998-8002-9577-eb119b7414c8
