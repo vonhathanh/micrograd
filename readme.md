@@ -13,9 +13,9 @@
 - Start with a tiny, small NN first (ideally one layer of MLP)
 - Careful about dead neural (all inputs were zero -> matmul x*w is zero, no gradient)
 - We want the input to be Gaussian distributed as we as the output (mean ~= 0 and std ~= 1) -> use kaiming init
-  - The reason behind this is we don't want the activation x*w becomes too small or too large, too small and activation(x) = 0
-  - Same as too large, derivate of too large number is squashed to 0
-  - Atleast at normalization these activations should roughly Gaussian distributed
+  - The reason behind this is we don't want the activation x*w becomes too small or too large, 
+  - Derivate of too large/small number is squashed to 0
+  - Atleast at initialization these activations should roughly Gaussian distributed
 - Batch normalization to make the hidden states becomes Gaussian distribution (subtract means and divide by std)
 - We don't want the hidden states to always Gaussian (at init is okay), that's why BN layer add some scale gamma and shifting beta
 - The side effect of adding BN layer is that we are coupling each training example with new variables (mean, std) in the mini batch
